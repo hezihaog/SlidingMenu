@@ -94,18 +94,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onMenuOpen() {
                 Log.d(TAG, "菜单打开");
+                //禁用触摸
+                vContentBg.setClickable(true);
             }
 
             @Override
             public void onSliding(float fraction) {
                 Log.d(TAG, "菜单拽托中，百分比：" + fraction);
-                Float value = mAlphaEvaluator.evaluate(fraction, 0, 0.55f);
+                float startValue = 0;
+                float endValue = 0.55f;
+                Float value = mAlphaEvaluator.evaluate(fraction, startValue, endValue);
                 vContentBg.setAlpha(value);
             }
 
             @Override
             public void onMenuClose() {
                 Log.d(TAG, "菜单关闭");
+                //恢复触摸
+                vContentBg.setClickable(false);
             }
         });
     }
