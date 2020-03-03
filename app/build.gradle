@@ -30,7 +30,9 @@ dependencies {
     //RecyclerView
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     //recyclerView多类型Adapter
-    api "me.drakeet.multitype:multitype:3.5.0"
+    implementation "me.drakeet.multitype:multitype:3.5.0"
+    //刷新布局
+    implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
