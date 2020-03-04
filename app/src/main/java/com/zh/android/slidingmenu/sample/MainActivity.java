@@ -89,20 +89,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupSlidingMenu() {
+        //创建估值器
         mAlphaEvaluator = new FloatEvaluator();
+        //设置侧滑菜单的状态切换监听
         vSlidingMenu.setOnMenuStateChangeListener(new SlidingMenu.OnMenuStateChangeListener() {
             @Override
             public void onMenuOpen() {
                 Log.d(TAG, "菜单打开");
-                //禁用触摸
+                //让黑色遮罩，禁用触摸
                 vContentBg.setClickable(true);
             }
 
             @Override
             public void onSliding(float fraction) {
                 Log.d(TAG, "菜单拽托中，百分比：" + fraction);
+                //设定最小、最大透明度值
                 float startValue = 0;
                 float endValue = 0.55f;
+                //估值当前的透明度值，并设置
                 Float value = mAlphaEvaluator.evaluate(fraction, startValue, endValue);
                 vContentBg.setAlpha(value);
             }
@@ -110,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onMenuClose() {
                 Log.d(TAG, "菜单关闭");
-                //恢复触摸
+                //让黑色遮罩，恢复触摸
                 vContentBg.setClickable(false);
             }
         });

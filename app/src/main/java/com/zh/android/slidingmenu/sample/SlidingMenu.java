@@ -52,21 +52,28 @@ public class SlidingMenu extends FrameLayout {
         init(context, attrs, defStyleAttr);
     }
 
+    /**
+     * 初始化
+     */
     private void init(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         mViewDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override
             public boolean tryCaptureView(@NonNull View child, int pointerId) {
+                //菜单和内容都可以拽托
                 return child == vMenuView || child == vContentView;
             }
 
             @Override
             public int getViewHorizontalDragRange(@NonNull View child) {
+                //拽托范围，返回非0值即可，某些情况需要该值来确定是否可以拽托
                 return vContentView.getWidth();
             }
 
             @Override
             public int clampViewPositionHorizontal(@NonNull View child, int left, int dx) {
+                //处理横向拽托，获取菜单宽度
                 int menuWidth = vMenuView.getWidth();
+                //因为拽托菜单和内容传入的对象不同，我们需要处理2种情况
                 if (child == vMenuView) {
                     //拽托的是菜单
                     if (left < -menuWidth) {
@@ -95,7 +102,7 @@ public class SlidingMenu extends FrameLayout {
             @Override
             public void onViewPositionChanged(@NonNull View changedView, int left, int top, int dx, int dy) {
                 super.onViewPositionChanged(changedView, left, top, dx, dy);
-                //拽托菜单布局，让内容布局跟着动
+                //处理联动，拽托菜单布局，让内容布局跟着动
                 if (changedView == vMenuView) {
                     int newLeft = vContentView.getLeft() + dx;
                     int right = newLeft + vContentView.getWidth();
@@ -105,11 +112,12 @@ public class SlidingMenu extends FrameLayout {
                     int newLeft = vMenuView.getLeft() + dx;
                     vMenuView.layout(newLeft, top, left, getBottom());
                 }
+                //处理滑动中的回调，计算滑动比值
                 if (mMenuStateChangeListener != null) {
                     float fraction = (vContentView.getLeft() * 1f) / vMenuView.getWidth();
                     mMenuStateChangeListener.onSliding(fraction);
                 }
-                //处理开、关状态
+                //处理开、关状态，由于该方法会不断被回调，所以需要加上状态值，保证只回调一次给监听器
                 if ((vMenuView.getLeft() == -vMenuView.getWidth()) && isOpenMenu) {
                     //关
                     isOpenMenu = false;
@@ -155,6 +163,7 @@ public class SlidingMenu extends FrameLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+        //获取所有子View，确保只有菜单和内容这2个控件
         int childCount = getChildCount();
         if (childCount != 2) {
             throw new IllegalStateException("侧滑菜单内只能有2个子View，分别是菜单和内容");
@@ -166,7 +175,7 @@ public class SlidingMenu extends FrameLayout {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        //菜单在最左边，普通状态是看不到的
+        //布局菜单和内容，菜单在最左边，普通状态是看不到的
         vMenuView.layout(-vMenuView.getMeasuredWidth(), top, left, bottom);
         //内容View铺满整个父控件
         vContentView.layout(left, top, right, bottom);
@@ -224,7 +233,7 @@ public class SlidingMenu extends FrameLayout {
         /**
          * 正在滑动时回调
          *
-         * @param fraction 滑动百分比值
+         * @param fraction 滑动比值
          */
         void onSliding(float fraction);
 
@@ -234,6 +243,11 @@ public class SlidingMenu extends FrameLayout {
         void onMenuClose();
     }
 
+    /**
+     * 设置状态改变监听
+     *
+     * @param menuStateChangeListener 监听器
+     */
     public void setOnMenuStateChangeListener(OnMenuStateChangeListener menuStateChangeListener) {
         mMenuStateChangeListener = menuStateChangeListener;
     }
