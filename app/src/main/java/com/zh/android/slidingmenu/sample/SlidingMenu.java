@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
@@ -53,6 +54,9 @@ public class SlidingMenu extends FrameLayout {
     }
 
     private void init(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        //获取系统中的View配置，获取最小的Fling操作速度
+        ViewConfiguration configuration = ViewConfiguration.get(context);
+        final int minimumFlingVelocity = configuration.getScaledMinimumFlingVelocity();
         mViewDragHelper = ViewDragHelper.create(this, 1.0f, new ViewDragHelper.Callback() {
             @Override
             public boolean tryCaptureView(@NonNull View child, int pointerId) {
@@ -128,13 +132,12 @@ public class SlidingMenu extends FrameLayout {
             @Override
             public void onViewReleased(@NonNull View releasedChild, float xvel, float yvel) {
                 super.onViewReleased(releasedChild, xvel, yvel);
-                //fling操作
-                if (xvel < 0) {
-                    //向左
+                //向左为负数
+                if (xvel < 0 && (Math.abs(xvel) >= minimumFlingVelocity)) {
                     closeMenu();
                     return;
-                } else if (xvel > 300) {
-                    //向右
+                } else if (xvel >= minimumFlingVelocity) {
+                    //向右为正数
                     openMenu();
                     return;
                 }
